@@ -1,5 +1,6 @@
 import logger from "../config/logger.js";
 import Course from "../models/course.model.js";
+import User from "../models/user.model.js";
 import { getKeywordsFromAI } from "../services/ai.service.js";
 import { uploadImage } from "../services/upload.service.js";
 import { ApiError } from "../utils/api-error.js";
@@ -95,4 +96,26 @@ export const getSingleCourse = asyncHandler(async (req, res, next) => {
   res
     .status(200)
     .json(new ApiResponse(200, course, "Course fetched successfully"));
+});
+
+export const getAllPurchasedCourses = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).populate("purchasedCourse");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const purchasedCourses = user.purchasedCourse;
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        purchasedCourses,
+        "Purchased courses fetched successfully"
+      )
+    );
 });
