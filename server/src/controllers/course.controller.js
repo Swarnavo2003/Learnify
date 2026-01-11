@@ -119,3 +119,26 @@ export const getAllPurchasedCourses = asyncHandler(async (req, res, next) => {
       )
     );
 });
+
+export const getPurchasedCourse = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { courseId } = req.params;
+
+  const user = await User.findById(userId).populate("purchasedCourse");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const purchasedCourse = user.purchasedCourse.find((course) =>
+    course._id.equals(courseId)
+  );
+
+  if (!purchasedCourse) {
+    throw new ApiError(404, "Purchased course not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, purchasedCourse, "Purchased course fetched"));
+});

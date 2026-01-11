@@ -4,6 +4,7 @@ import {
   createCourse,
   getAllPurchasedCourses,
   getCourse,
+  getPurchasedCourse,
   getSingleCourse,
 } from "../controllers/course.controller.js";
 import upload from "../middleware/multer.middleware.js";
@@ -22,5 +23,11 @@ router.get("/get-courses", protectedRoute, getCourse);
 router.get("/get-course/:courseId", protectedRoute, getSingleCourse);
 
 router.get("/get-purchased-courses", protectedRoute, getAllPurchasedCourses);
+
+router.get(
+  "/get-purchased-course/:courseId",
+  protectedRoute,
+  getPurchasedCourse
+);
 
 export default router;
