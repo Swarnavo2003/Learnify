@@ -7,6 +7,8 @@ const moduleSchema = new mongoose.Schema(
       ref: "Course",
     },
     video: { type: String, required: true, trim: true },
+    videoPublicId: { type: String, required: true, trim: true },
+    videoDuration: { type: Number, required: true },
     title: { type: String, required: true, trim: true },
     quiz: {
       type: mongoose.Schema.Types.ObjectId,

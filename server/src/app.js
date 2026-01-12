@@ -5,6 +5,7 @@ import logger from "./config/logger.js";
 import { errorHandler } from "./utils/error-handler.js";
 import userRouter from "./routes/user.router.js";
 import courseRouter from "./routes/course.router.js";
+import moduleRouter from "./routes/module.router.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
+app.use("/api/modules", moduleRouter);
 
 app.use(errorHandler);
 
