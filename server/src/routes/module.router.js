@@ -1,7 +1,13 @@
 import express from "express";
 import { adminRoute, protectedRoute } from "../middleware/auth.middleware.js";
 import videoUpload from "../middleware/video-upload.middleware.js";
-import { createModule } from "../controllers/module.controller.js";
+import {
+  createModule,
+  deleteModule,
+  getAllModules,
+  getModule,
+  updateModule,
+} from "../controllers/module.controller.js";
 
 const router = express.Router();
 
@@ -11,6 +17,25 @@ router.post(
   adminRoute,
   videoUpload.single("video"),
   createModule
+);
+
+router.get("/get-modules", protectedRoute, getAllModules);
+
+router.get("/get-module/:moduleId", protectedRoute, getModule);
+
+router.put(
+  "/update-module/:moduleId",
+  protectedRoute,
+  adminRoute,
+  videoUpload.single("video"),
+  updateModule
+);
+
+router.delete(
+  "/delete-module/:moduleId",
+  protectedRoute,
+  adminRoute,
+  deleteModule
 );
 
 export default router;

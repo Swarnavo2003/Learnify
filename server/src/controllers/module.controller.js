@@ -1,9 +1,15 @@
+import Comment from "../models/comment.model.js";
 import Course from "../models/course.model.js";
 import Module from "../models/module.model.js";
+import { deleteVideo } from "../services/upload.service.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
-import { moduleCreationSchema } from "../validations/index.js";
+import {
+  commendCreationSchema,
+  moduleCreationSchema,
+  moduleUpdationSchema,
+} from "../validations/index.js";
 
 export const createModule = asyncHandler(async (req, res, next) => {
   const moduleCreationData = moduleCreationSchema.safeParse(req.body);
@@ -42,4 +48,90 @@ export const createModule = asyncHandler(async (req, res, next) => {
   return res
     .status(201)
     .json(new ApiResponse(201, module, "Module created successfully"));
+});
+
+export const getAllModules = asyncHandler(async (req, res, next) => {
+  const modules = await Module.find();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, modules, "Modules fetched successfully"));
+});
+
+export const getModule = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+  const module = await Module.findById(moduleId);
+  if (!module) {
+    throw new ApiError(404, "Module not found");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, module, "Module fetched successfully"));
+});
+
+export const deleteModule = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+  const module = await Module.findByIdAndDelete(moduleId);
+  if (!module) {
+    throw new ApiError(404, "Module not found");
+  }
+
+  await deleteVideo(module.videoPublicId);
+
+  const course = await Course.findById(module.courseId);
+  course.modules.pull(moduleId);
+  await course.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, module, "Module deleted successfully"));
+});
+
+export const updateModule = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+  const module = await Module.findById(moduleId);
+  if (!module) {
+    throw new ApiError(404, "Module not found");
+  }
+
+  const moduleUpdationData = moduleUpdationSchema.safeParse(req.body);
+  if (!moduleUpdationData.success) {
+    throw new ApiError(
+      400,
+      "Validation Error",
+      moduleUpdationData.error.issues.map((issue) => issue.message).join(", ")
+    );
+  }
+
+  const { title } = moduleUpdationData.data;
+
+  await deleteVideo(module.videoPublicId);
+
+  module.title = title;
+  module.module.video = req.file.path;
+  module.videoPublicId = req.file.filename;
+  module.videoDuration = req.file.duration || 0;
+  await module.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, module, "Module updated successfully"));
+});
+
+export const getComments = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+  const module = await Module.findById(moduleId).populate({
+    path: "comments",
+    populate: {
+      path: "userId",
+      select: "fullName email",
+    },
+  });
+  if (!module) {
+    throw new ApiError(404, "Module not found");
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, module.comment, "Comments fetched successfully")
+    );
 });
