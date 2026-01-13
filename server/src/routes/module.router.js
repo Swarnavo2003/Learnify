@@ -11,13 +11,7 @@ import {
 
 const router = express.Router();
 
-router.post(
-  "/create-module",
-  protectedRoute,
-  adminRoute,
-  videoUpload.single("video"),
-  createModule
-);
+router.post("/create-module", protectedRoute, adminRoute, createModule);
 
 router.get("/get-modules", protectedRoute, getAllModules);
 
@@ -27,7 +21,7 @@ router.put(
   "/update-module/:moduleId",
   protectedRoute,
   adminRoute,
-  videoUpload.single("video"),
+  // videoUpload.single("video"),
   updateModule
 );
 

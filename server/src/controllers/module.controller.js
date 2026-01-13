@@ -37,9 +37,9 @@ export const createModule = asyncHandler(async (req, res, next) => {
   const module = await Module.create({
     courseId,
     title,
-    video: req.file.path,
-    videoPublicId: req.file.filename,
-    videoDuration: req.file.duration || 0,
+    // video: req.file.path,
+    // videoPublicId: req.file.filename,
+    // videoDuration: req.file.duration || 0,
   });
 
   course.modules.push(module._id);
@@ -51,7 +51,7 @@ export const createModule = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllModules = asyncHandler(async (req, res, next) => {
-  const modules = await Module.find();
+  const modules = await Module.find().populate("lectures");
   return res
     .status(200)
     .json(new ApiResponse(200, modules, "Modules fetched successfully"));
@@ -59,7 +59,7 @@ export const getAllModules = asyncHandler(async (req, res, next) => {
 
 export const getModule = asyncHandler(async (req, res, next) => {
   const { moduleId } = req.params;
-  const module = await Module.findById(moduleId);
+  const module = await Module.findById(moduleId).populate("lectures");
   if (!module) {
     throw new ApiError(404, "Module not found");
   }
@@ -104,34 +104,13 @@ export const updateModule = asyncHandler(async (req, res, next) => {
 
   const { title } = moduleUpdationData.data;
 
-  await deleteVideo(module.videoPublicId);
-
   module.title = title;
-  module.module.video = req.file.path;
-  module.videoPublicId = req.file.filename;
-  module.videoDuration = req.file.duration || 0;
+  // module.video = req.file.path;
+  // module.videoPublicId = req.file.filename;
+  // module.videoDuration = req.file.duration || 0;
   await module.save();
 
   return res
     .status(200)
     .json(new ApiResponse(200, module, "Module updated successfully"));
-});
-
-export const getComments = asyncHandler(async (req, res, next) => {
-  const { moduleId } = req.params;
-  const module = await Module.findById(moduleId).populate({
-    path: "comments",
-    populate: {
-      path: "userId",
-      select: "fullName email",
-    },
-  });
-  if (!module) {
-    throw new ApiError(404, "Module not found");
-  }
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, module.comment, "Comments fetched successfully")
-    );
 });
