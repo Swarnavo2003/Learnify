@@ -1,12 +1,11 @@
-import Comment from "../models/comment.model.js";
 import Course from "../models/course.model.js";
+import Lecture from "../models/lecture.model.js";
 import Module from "../models/module.model.js";
 import { deleteVideo } from "../services/upload.service.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import {
-  commendCreationSchema,
   moduleCreationSchema,
   moduleUpdationSchema,
 } from "../validations/index.js";
@@ -37,9 +36,6 @@ export const createModule = asyncHandler(async (req, res, next) => {
   const module = await Module.create({
     courseId,
     title,
-    // video: req.file.path,
-    // videoPublicId: req.file.filename,
-    // videoDuration: req.file.duration || 0,
   });
 
   course.modules.push(module._id);
@@ -75,7 +71,15 @@ export const deleteModule = asyncHandler(async (req, res, next) => {
     throw new ApiError(404, "Module not found");
   }
 
-  await deleteVideo(module.videoPublicId);
+  if (module.lectures.length > 0) {
+    module.lectures.map(async (lecture) => {
+      await deleteVideo(lecture.videoPublicId);
+    });
+
+    module.lectures.map(async (lecture) => {
+      await Lecture.findByIdAndDelete(lecture._id);
+    });
+  }
 
   const course = await Course.findById(module.courseId);
   course.modules.pull(moduleId);
@@ -105,9 +109,6 @@ export const updateModule = asyncHandler(async (req, res, next) => {
   const { title } = moduleUpdationData.data;
 
   module.title = title;
-  // module.video = req.file.path;
-  // module.videoPublicId = req.file.filename;
-  // module.videoDuration = req.file.duration || 0;
   await module.save();
 
   return res
