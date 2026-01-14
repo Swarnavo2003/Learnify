@@ -27,12 +27,6 @@ export const createModule = asyncHandler(async (req, res, next) => {
     throw new ApiError(404, "Course not found");
   }
 
-  const video = req.file;
-  if (!video) {
-    logger.error("Video is required for module creation");
-    throw new ApiError(400, "Video is required");
-  }
-
   const module = await Module.create({
     courseId,
     title,

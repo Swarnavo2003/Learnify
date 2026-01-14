@@ -7,6 +7,7 @@ import userRouter from "./routes/user.router.js";
 import courseRouter from "./routes/course.router.js";
 import moduleRouter from "./routes/module.router.js";
 import commentRouter from "./routes/comment.router.js";
+import lectureRouter from "./routes/lecture.router.js";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/modules", moduleRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/lectures", lectureRouter);
 
 app.use(errorHandler);
 
