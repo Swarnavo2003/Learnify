@@ -28,3 +28,32 @@ export const createLecture = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, lecture, "Lecture created successfully"));
 });
+
+export const getLecturesByModuleId = asyncHandler(async (req, res, next) => {
+  const { moduleId } = req.params;
+
+  const lectures = await Lecture.find({ moduleId })
+    .sort({ createdAt: -1 })
+    .populate("comment");
+
+  if (!lectures) {
+    throw new ApiError(404, "Lectures not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, lectures, "Lectures fetched successfully"));
+});
+
+export const getLectureByLectureId = asyncHandler(async (req, res, next) => {
+  const { lectureId } = req.params;
+  const lecture = await Lecture.findById(lectureId).populate("comment");
+
+  if (!lecture) {
+    throw new ApiError(404, "Lecture not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, lecture, "Lecture fetched successfully"));
+});
