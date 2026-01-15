@@ -51,3 +51,7 @@ export const lectureCreationSchema = z.object({
 export const commendCreationSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
 });
+
+export const addCourseToCartSchema = z.object({
+  courseId: z.string().min(1, "Course ID is required"),
+});
