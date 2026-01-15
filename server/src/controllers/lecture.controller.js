@@ -1,4 +1,5 @@
 import Lecture from "../models/lecture.model.js";
+import Module from "../models/module.model.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
@@ -23,6 +24,10 @@ export const createLecture = asyncHandler(async (req, res, next) => {
     videoPublicId: req.file.filename,
     videoDuration: req.file.duration || 0,
   });
+
+  const module = await Module.findById(moduleId);
+  module.lectures.push(lecture._id);
+  await module.save();
 
   return res
     .status(200)

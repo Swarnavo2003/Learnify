@@ -4,8 +4,8 @@ import videoUpload from "../middleware/video-upload.middleware.js";
 import {
   createModule,
   deleteModule,
-  getAllModules,
   getModule,
+  getModulesByCourseId,
   updateModule,
 } from "../controllers/module.controller.js";
 
@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/create-module", protectedRoute, adminRoute, createModule);
 
-router.get("/get-modules", protectedRoute, getAllModules);
+router.get("/get-modules/:courseId", protectedRoute, getModulesByCourseId);
 
 router.get("/get-module/:moduleId", protectedRoute, getModule);
 

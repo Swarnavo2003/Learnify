@@ -40,8 +40,9 @@ export const createModule = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(201, module, "Module created successfully"));
 });
 
-export const getAllModules = asyncHandler(async (req, res, next) => {
-  const modules = await Module.find().populate("lectures");
+export const getModulesByCourseId = asyncHandler(async (req, res, next) => {
+  const { courseId } = req.params;
+  const modules = await Module.find({ courseId }).populate("lectures");
   return res
     .status(200)
     .json(new ApiResponse(200, modules, "Modules fetched successfully"));
