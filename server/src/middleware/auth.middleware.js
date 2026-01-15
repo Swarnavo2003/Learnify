@@ -6,7 +6,20 @@ import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 
 export const protectedRoute = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+  let token = req.cookies.token;
+
+  if (!token && req.headers.authorization) {
+    const authHeader = req.headers.authorization;
+    if (authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else {
+      throw new ApiError(
+        401,
+        "Unauthorized: Invalid authorization format. Use 'Bearer <token>'"
+      );
+    }
+  }
+
   if (!token) {
     throw new ApiError(401, "Unauthorized: No token provided");
   }

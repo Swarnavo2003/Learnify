@@ -9,8 +9,11 @@ import moduleRouter from "./routes/module.router.js";
 import commentRouter from "./routes/comment.router.js";
 import lectureRouter from "./routes/lecture.router.js";
 import healthCheckRouter from "./routes/health-check.router.js";
+import { setUpSwagger } from "./config/swagger.js";
 
 const app = express();
+
+setUpSwagger(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
