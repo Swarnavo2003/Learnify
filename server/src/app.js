@@ -9,6 +9,7 @@ import moduleRouter from "./routes/module.router.js";
 import commentRouter from "./routes/comment.router.js";
 import lectureRouter from "./routes/lecture.router.js";
 import healthCheckRouter from "./routes/health-check.router.js";
+import cartRouter from "./routes/cart.router.js";
 import { setUpSwagger } from "./config/swagger.js";
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/courses", courseRouter);
 app.use("/api/modules", moduleRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/lectures", lectureRouter);
+app.use("/api/carts", cartRouter);
 
 app.use(errorHandler);
 
