@@ -3,7 +3,10 @@ import Lecture from "../models/lecture.model.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
-import { commendCreationSchema } from "../validations/index.js";
+import {
+  commendCreationSchema,
+  commendtUpdationSchema,
+} from "../validations/index.js";
 
 export const createComment = asyncHandler(async (req, res, next) => {
   const { lectureId } = req.params;
@@ -17,7 +20,7 @@ export const createComment = asyncHandler(async (req, res, next) => {
     throw new ApiError(
       400,
       "Validation Error",
-      commentCreationData.error.issues.map((issue) => issue.message).join(", ")
+      commentCreationData.error.issues.map((issue) => issue.message).join(", "),
     );
   }
 
@@ -44,5 +47,33 @@ export const getAllCommentsByLectureId = asyncHandler(
     return res
       .status(200)
       .json(new ApiResponse(200, comments, "Comments fetched successfully"));
-  }
+  },
 );
+
+export const updateCommentByCommenId = asyncHandler(async (req, res, next) => {
+  const { commentId } = req.params;
+  const existingComment = await Comment.findById(commentId);
+  if (!existingComment) {
+    throw new ApiError(404, "Comment not found");
+  }
+
+  const commentUpdationData = commendtUpdationSchema.safeParse(req.body);
+  if (!commentUpdationData.success) {
+    throw new ApiError(
+      400,
+      "Validation Error",
+      commentUpdationData.error.issues.map((issue) => issue.message).join(", "),
+    );
+  }
+
+  const { comment } = commentUpdationData.data;
+
+  existingComment.comment = comment;
+  await existingComment.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, existingComment, "Comment updated successfully"),
+    );
+});
