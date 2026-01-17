@@ -50,7 +50,7 @@ export const getAllCommentsByLectureId = asyncHandler(
   },
 );
 
-export const updateCommentByCommenId = asyncHandler(async (req, res, next) => {
+export const updateCommentByCommentId = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
   const existingComment = await Comment.findById(commentId);
   if (!existingComment) {
@@ -76,4 +76,26 @@ export const updateCommentByCommenId = asyncHandler(async (req, res, next) => {
     .json(
       new ApiResponse(200, existingComment, "Comment updated successfully"),
     );
+});
+
+export const deleteCommentByCommentId = asyncHandler(async (req, res, next) => {
+  const { commentId, lectureId } = req.params;
+  const lecture = await Lecture.findById(lectureId);
+  if (!lecture) {
+    throw new ApiError(404, "Lecture not found");
+  }
+
+  const comment = await Comment.findByIdAndDelete(commentId);
+  if (!comment) {
+    throw new ApiError(404, "Comment not found");
+  }
+
+  lecture.comment = lecture.comment.filter(
+    (commentId) => commentId !== String(comment._id),
+  );
+  await lecture.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, comment, "Comment deleted successfully"));
 });
